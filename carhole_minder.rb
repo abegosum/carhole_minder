@@ -95,6 +95,30 @@ class CarholeMinder
     end
     update_timer_led_indicator
   end
+
+  def disable_timer
+    @timer_setting = TIMER_DISABLED_INDICATOR
+    puts "Timer disabled"
+    update_timer_led_indicator
+  end
+
+  def enable_timer
+    @timer_setting = 0
+    puts "Timer enabled"
+    update_timer_led_indicator
+  end
+
+  def timer_disabled?
+    @timer_setting == TIMER_DISABLED_INDICATOR
+  end
+
+  def toggle_timer
+    if timer_disabled?
+      enable_timer
+    else 
+      disable_timer
+    end
+  end
   
   def run!
     init_gpio
@@ -104,8 +128,13 @@ class CarholeMinder
       open_garage_door
     end
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
+    timer_button_service.long_press_lambda = lambda { toggle_timer }
     timer_button_service.start_button_listener do
-      advance_timer_setting
+      if timer_disabled?
+        enable_timer
+      else
+        advance_timer_setting
+      end
     end
     while true
       sleep MAIN_THREAD_SLEEP_DELAY

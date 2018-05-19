@@ -4,6 +4,7 @@ require 'constants'
 class ButtonListenerService
 	attr_reader :button_pin
   attr_reader :button_name
+  attr_accessor :long_press_lambda
 	
 	def initialize(button_pin, button_name)
 		@button_pin = button_pin
@@ -21,7 +22,16 @@ class ButtonListenerService
 	end
 
 	def wait_for_button_release
+    start_wait_time = Time.now.to_i
 		loop do
+      unless start_wait_time.nil?
+        seconds_past = Time.now.to_i - start_wait_time
+        if seconds_past >= LONG_PRESS_SECONDS
+          puts "Long press of #{button_name} detected"
+          long_press_lambda.call unless long_press_lambda.nil?
+          start_wait_time = nil
+        end
+      end
 			button_still_pressed = button_pressed?
 			break unless button_still_pressed
 			sleep LOOP_DELAY
