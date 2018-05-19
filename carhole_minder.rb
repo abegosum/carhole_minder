@@ -129,10 +129,18 @@ class CarholeMinder
   def run!
     init_gpio
     init_pins
+
     door_button_service = ButtonListenerService.new(DOOR_BUTTON_PIN, 'DOOR_BUTTON')
     door_button_service.start_button_listener do 
       open_or_close_garage_door
     end
+
+    door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
+    door_open_service.start_door_open_switch_listener do
+      puts "TIMER REACHED!"
+      close_garage_door_by_timer
+    end
+
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
     timer_button_service.long_press_lambda = lambda { toggle_timer }
     timer_button_service.start_button_listener do
@@ -141,12 +149,10 @@ class CarholeMinder
       else
         advance_timer_setting
       end
+      door_open_service.update_timer_setting timer_setting
+      door_open_service.reset_timer
     end
-    door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
-    door_open_service.start_door_open_switch_listener do
-      puts "TIMER REACHED!"
-      close_garage_door_by_timer
-    end
+    
     while true
       sleep MAIN_THREAD_SLEEP_DELAY
     end
