@@ -68,11 +68,16 @@ class CarholeMinder
     end
   end
   
-  def open_garage_door
+  def open_or_close_garage_door
     blink_door_button_led
     RPi::GPIO.set_low RELAY_PIN
     sleep RELAY_OPEN_DELAY
     RPi::GPIO.set_high RELAY_PIN
+  end
+
+  def close_garage_door_by_timer
+    puts "Attempting to close open door"
+    open_or_close_garage_door
   end
   
   def update_timer_led_indicator
@@ -126,7 +131,7 @@ class CarholeMinder
     init_pins
     door_button_service = ButtonListenerService.new(DOOR_BUTTON_PIN, 'DOOR_BUTTON')
     door_button_service.start_button_listener do 
-      open_garage_door
+      open_or_close_garage_door
     end
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
     timer_button_service.long_press_lambda = lambda { toggle_timer }
@@ -140,6 +145,7 @@ class CarholeMinder
     door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
     door_open_service.start_door_open_switch_listener do
       puts "TIMER REACHED!"
+      close_garage_door_by_timer
     end
     while true
       sleep MAIN_THREAD_SLEEP_DELAY
