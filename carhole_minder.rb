@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift('.')
 require 'constants'
 require 'button_listener_service'
+require 'door_open_switch_listener_service'
 
 TIMER_PINS = [ TIMER_SETTING_1_LED, TIMER_SETTING_2_LED, TIMER_SETTING_3_LED ]
 
@@ -135,6 +136,10 @@ class CarholeMinder
       else
         advance_timer_setting
       end
+    end
+    door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
+    door_open_service.start_door_open_switch_listener do
+      puts "TIMER REACHED!"
     end
     while true
       sleep MAIN_THREAD_SLEEP_DELAY
