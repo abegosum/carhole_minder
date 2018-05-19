@@ -51,7 +51,7 @@ class DoorOpenSwitchListenerService
           end
         else
           puts "Door closed" unless @door_open_detected_time.nil?
-          @door_open_detected_time = nil
+          reset_timer
         end
 				sleep LOOP_DELAY
       end
