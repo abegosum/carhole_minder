@@ -13,8 +13,37 @@ class DoorOpenSwitchListenerService
 
 	def initialize_gpio
 		RPi::GPIO.setup DOOR_OPEN_SWITCH_PIN, :as => :input
+    RPi::GPIO.setup TIMER_BUTTON_LED_PIN, :as => :output
+    turn_on_timer_button_led
 		@gpio_is_initialized = true
 	end
+
+  def turn_on_timer_button_led
+    RPi::GPIO.set_high TIMER_BUTTON_LED_PIN
+  end
+
+  def turn_off_timer_button_led
+    RPi::GPIO.set_low TIMER_BUTTON_LED_PIN
+  end
+
+  def start_blinking_timer_button
+    @button_blink_thread = Thread.new do
+      current_thread = Thread.current
+      while ! current_thread[:stop]
+        turn_off_timer_button_led
+        sleep TIMER_BUTTON_BLINK_DURATION
+        turn_on_timer_button_led
+        sleep TIMER_BUTTON_BLINK_DURATION
+      end
+      turn_on_timer_button_led
+    end if @button_blink_thread.nil?
+  end
+
+  def stop_blinking_timer_button
+    @button_blink_thread[:stop] = true unless @button_blink_thread.nil?
+    @button_blink_thread = nil
+    turn_on_timer_button_led
+  end
 
   def door_open?
     RPi::GPIO.low? DOOR_OPEN_SWITCH_PIN
@@ -36,11 +65,13 @@ class DoorOpenSwitchListenerService
 
   def start_door_open_switch_listener
     initialize_gpio unless @gpio_is_initialized
+    stop_blinking_timer_button
     @service_thread = Thread.new do 
       current_thread = Thread.current
       while ! current_thread[:stop]
         if door_open?
           puts "Door opened" unless @door_open_detected_time
+          start_blinking_timer_button
           @door_open_detected_time = Time.now.to_i unless @door_open_detected_time
           if current_thread[:delay_seconds]
             seconds_since_open = Time.now.to_i - @door_open_detected_time
@@ -52,6 +83,7 @@ class DoorOpenSwitchListenerService
         else
           puts "Door closed" unless @door_open_detected_time.nil?
           reset_timer
+          stop_blinking_timer_button
         end
 				sleep LOOP_DELAY
       end
@@ -63,6 +95,7 @@ class DoorOpenSwitchListenerService
 
   private
   @service_thread = nil
+  @button_blink_thread = nil
   @door_open_detected_time = nil
   @gpio_is_initialized = false
   @timer_has_been_tripped = false
