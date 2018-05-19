@@ -3,14 +3,15 @@ require 'constants'
 
 class ButtonListenerService
 	attr_reader :button_pin
+  attr_reader :button_name
 	
-	def initialize(button_pin)
+	def initialize(button_pin, button_name)
 		@button_pin = button_pin
+    @button_name = button_name
 	end
 		
 
 	def initialize_gpio
-		RPi::GPIO.set_numbering :bcm
 		RPi::GPIO.setup button_pin, :as => :input
 		@gpio_is_initialized = true
 	end
@@ -25,6 +26,7 @@ class ButtonListenerService
 			break unless button_still_pressed
 			sleep LOOP_DELAY
 		end
+    puts "#{button_name} button released"
 	end
 
 	def stop_button_listener
@@ -41,6 +43,7 @@ class ButtonListenerService
 			current_thread = Thread.current
 			while ! current_thread[:stop]
 				if button_pressed?
+          puts "#{button_name} button pressed"
 					yield
 					wait_for_button_release
 				end
