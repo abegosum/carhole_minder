@@ -7,9 +7,7 @@ Type=simple
 User=pi
 Group=pi
 WorkingDirectory=/opt/carhole_minder
-ExecStart=/usr/local/bin/bundle exec ruby daemon_control.rb start
-ExecStop=/usr/local/bin/bundle exec ruby daemon_control.rb stop
+ExecStart=/usr/local/bin/bundle exec ruby daemon_start.rb
 TimeoutSec=30
 RestartSec=15
-Restart=on-failure
 
