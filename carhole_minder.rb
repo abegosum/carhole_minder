@@ -161,6 +161,12 @@ class CarholeMinder
       door_open_service.update_timer_setting timer_setting
       door_open_service.reset_timer
     end
+
+    Kernel.trap 'SIGTERM' do 
+      puts "Trapped Signal"
+      shutdown_service_leds
+      exit(0)
+    end
     
     begin
       while true
