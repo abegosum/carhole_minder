@@ -1,0 +1,14 @@
+[Unit]
+Description=Garage Open Buttons Minder
+Requires=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/carhole_minder
+ExecStart=/usr/local/bin/bundle exec ruby daemon_control.rb start
+TimeoutSec=30
+RestartSec=15
+Restart=on-failure
+
