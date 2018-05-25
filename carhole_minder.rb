@@ -125,7 +125,16 @@ class CarholeMinder
       disable_timer
     end
   end
-  
+
+  def shutdown_service_leds
+    turn_off_led READY_LED_PIN
+    turn_off_led DOOR_BUTTON_LED_PIN
+    turn_off_led TIMER_BUTTON_LED_PIN
+    turn_off_led TIMER_SETTING_1_LED
+    turn_off_led TIMER_SETTING_2_LED
+    turn_off_led TIMER_SETTING_3_LED
+  end
+
   def run!
     init_gpio
     init_pins
@@ -153,10 +162,15 @@ class CarholeMinder
       door_open_service.reset_timer
     end
     
-    while true
-      sleep MAIN_THREAD_SLEEP_DELAY
+    begin
+      while true
+        sleep MAIN_THREAD_SLEEP_DELAY
+      end
+    rescue SignalException => e
+      puts "Received Signal Exception #{e}"
+      shutdown_service_leds
+      exit(0)
     end
   end
   
-  #run!
 end

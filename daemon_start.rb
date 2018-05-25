@@ -1,5 +1,4 @@
-$LOAD_PATH.unshift('.')
 
-require 'carhole_minder'
+require_relative 'carhole_minder'
 service = CarholeMinder.new
 service.run!

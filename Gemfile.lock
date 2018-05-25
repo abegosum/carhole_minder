@@ -1,12 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    daemons (1.2.6)
     rpi_gpio (0.3.3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  daemons
   rpi_gpio
 
 BUNDLED WITH
