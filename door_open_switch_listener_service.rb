@@ -11,6 +11,30 @@ class DoorOpenSwitchListenerService
     @timer_setting = timer_setting
   end
 
+  def disble_timer
+    @service_thread[:timer_enabled] = false unless @service_thread.nil?
+    if @service_thread
+      puts "Disabling Timer"
+    else
+      puts "Service Not Defined"
+    end
+  end
+
+  def enable_timer
+    @service_thread[:timer_enabled] = true unless @service_thread.nil?
+    if @service_thread
+      puts "Enabling Timer"
+    else
+      puts "Service Not Defined"
+    end
+  end
+
+  def toggle_timer
+    unless @service_thread.nil?
+      @service_thread[:timer_enabled] = ! @service_thread[:timer_enabled]
+    end
+  end
+
 	def initialize_gpio
 		RPi::GPIO.setup DOOR_OPEN_SWITCH_PIN, :as => :input
     RPi::GPIO.setup TIMER_BUTTON_LED_PIN, :as => :output
@@ -54,6 +78,7 @@ class DoorOpenSwitchListenerService
   end
 
   def update_timer_setting(setting_index)
+    enable_timer unless setting_index == TIMER_DISABLED_INDICATOR
     @timer_setting = setting_index
     @service_thread[:delay_seconds] = delay_in_seconds unless @service_thread.nil?
   end
@@ -68,12 +93,13 @@ class DoorOpenSwitchListenerService
     stop_blinking_timer_button
     @service_thread = Thread.new do 
       current_thread = Thread.current
+      current_thread[:timer_enabled] = true
       while ! current_thread[:stop]
         if door_open?
           puts "Door opened" unless @door_open_detected_time
           start_blinking_timer_button
           @door_open_detected_time = Time.now.to_i unless @door_open_detected_time
-          if current_thread[:delay_seconds]
+          if current_thread[:delay_seconds] && current_thread[:timer_enabled]
             seconds_since_open = Time.now.to_i - @door_open_detected_time
             if (seconds_since_open > current_thread[:delay_seconds]) && !@timer_has_been_tripped
               @timer_has_been_tripped = true

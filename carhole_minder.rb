@@ -151,9 +151,13 @@ class CarholeMinder
     end
 
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
-    timer_button_service.long_press_lambda = lambda { toggle_timer }
+    timer_button_service.long_press_lambda = lambda do 
+      toggle_timer
+      door_open_service.toggle_timer
+    end
     timer_button_service.start_button_listener do
       if timer_disabled?
+        door_open_service.reset_timer # prevent instantaneous closing on timer enable
         enable_timer
       else
         advance_timer_setting
