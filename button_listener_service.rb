@@ -5,10 +5,12 @@ class ButtonListenerService
 	attr_reader :button_pin
   attr_reader :button_name
   attr_accessor :long_press_lambda
+  attr_accessor :long_press_delay
 	
 	def initialize(button_pin, button_name)
 		@button_pin = button_pin
     @button_name = button_name
+    @long_press_delay = LONG_PRESS_SECONDS
 	end
 		
 
@@ -26,7 +28,7 @@ class ButtonListenerService
 		loop do
       unless start_wait_time.nil?
         seconds_past = Time.now.to_i - start_wait_time
-        if seconds_past >= LONG_PRESS_SECONDS
+        if seconds_past >= @long_press_delay
           puts "Long press of #{button_name} detected"
           long_press_lambda.call unless long_press_lambda.nil?
           start_wait_time = nil

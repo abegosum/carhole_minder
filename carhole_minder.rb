@@ -135,11 +135,22 @@ class CarholeMinder
     turn_off_led TIMER_SETTING_3_LED
   end
 
+  def shutdown_computer
+    system '/usr/bin/sudo /sbin/shutdown -h 0'
+  end
+
   def run!
+    Thread.abort_on_exception = true
     init_gpio
     init_pins
 
     door_button_service = ButtonListenerService.new(DOOR_BUTTON_PIN, 'DOOR_BUTTON')
+    door_button_service.long_press_delay = SHUTDOWN_LONG_PRESS_SECONDS
+    door_button_service.long_press_lambda = lambda do
+      shutdown_service_leds
+      shutdown_computer
+    end
+      
     door_button_service.start_button_listener do 
       open_or_close_garage_door
     end
