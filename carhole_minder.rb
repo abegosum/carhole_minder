@@ -138,6 +138,10 @@ class CarholeMinder
     system '/usr/bin/sudo /sbin/shutdown -h 0'
   end
 
+  def door_open?
+    (! @door_open_service.nil?) && @door_open_service.door_open?
+  end
+
   def run!
     Thread.abort_on_exception = true
     init_gpio
@@ -154,8 +158,8 @@ class CarholeMinder
       open_or_close_garage_door
     end
 
-    door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
-    door_open_service.start_door_open_switch_listener do
+    @door_open_service = DoorOpenSwitchListenerService.new(timer_setting)
+    @door_open_service.start_door_open_switch_listener do
       puts "TIMER REACHED!"
       close_garage_door_by_timer
     end
@@ -163,17 +167,17 @@ class CarholeMinder
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
     timer_button_service.long_press_lambda = lambda do 
       toggle_timer
-      door_open_service.toggle_timer
+      @door_open_service.toggle_timer
     end
     timer_button_service.start_button_listener do
       if timer_disabled?
-        door_open_service.reset_timer # prevent instantaneous closing on timer enable
+        @door_open_service.reset_timer # prevent instantaneous closing on timer enable
         enable_timer
       else
         advance_timer_setting
       end
-      door_open_service.update_timer_setting timer_setting
-      door_open_service.reset_timer
+      @door_open_service.update_timer_setting timer_setting
+      @door_open_service.reset_timer
     end
 
     Kernel.trap 'SIGTERM' do 
@@ -192,5 +196,8 @@ class CarholeMinder
       exit(0)
     end
   end
+
+  private
+  @door_open_service = nil
   
 end
