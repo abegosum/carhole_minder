@@ -117,6 +117,16 @@ class CarholeMinder
     @timer_setting == TIMER_DISABLED_INDICATOR
   end
 
+  def get_timer_setting_index
+    @door_open_service.get_timer_setting_index
+  end
+  
+  def set_timer_setting_index(index)
+    @door_open_service.update_timer_setting index
+    @timer_setting = index
+    update_timer_led_indicator
+  end
+
   def toggle_timer
     if timer_disabled?
       enable_timer

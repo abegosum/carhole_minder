@@ -74,7 +74,11 @@ class DoorOpenSwitchListenerService
   end
 
   def delay_in_seconds
-    DOOR_DELAYS[timer_setting] * 60
+    DOOR_DELAYS[@timer_setting] * 60
+  end
+
+  def get_timer_setting_index
+    @timer_setting
   end
 
   def update_timer_setting(setting_index)
