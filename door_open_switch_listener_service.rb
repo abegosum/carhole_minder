@@ -1,5 +1,5 @@
 require 'rpi_gpio'
-require 'constants'
+require_relative 'constants'
 
 DOOR_DELAYS = [TIMER_SETTING_1_MINUTES, TIMER_SETTING_2_MINUTES, TIMER_SETTING_3_MINUTES]
 

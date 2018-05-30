@@ -1,5 +1,5 @@
 require 'rpi_gpio'
-require 'constants'
+require_relative 'constants'
 
 class ButtonListenerService
 	attr_reader :button_pin

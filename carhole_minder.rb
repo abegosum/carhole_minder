@@ -1,7 +1,6 @@
-$LOAD_PATH.unshift('.')
-require 'constants'
-require 'button_listener_service'
-require 'door_open_switch_listener_service'
+require_relative 'constants'
+require_relative 'button_listener_service'
+require_relative 'door_open_switch_listener_service'
 
 TIMER_PINS = [ TIMER_SETTING_1_LED, TIMER_SETTING_2_LED, TIMER_SETTING_3_LED ]
 
