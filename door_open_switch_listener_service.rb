@@ -9,6 +9,8 @@ class DoorOpenSwitchListenerService
 
   def initialize(timer_setting)
     @timer_setting = timer_setting
+    @door_open_lambdas = []
+    @door_close_lambdas = []
   end
 
   def disble_timer
@@ -92,17 +94,44 @@ class DoorOpenSwitchListenerService
     @timer_has_been_tripped = false
   end
 
+  def notify_door_opened
+    unless @door_open_detected_time
+      puts "Door opened"
+      @door_open_detected_time = Time.now.to_i
+      @door_open_lambdas.each do |cur_listener|
+        cur_listener.call(@door_open_detected_time)
+      end
+    end
+  end
+
+  def notify_door_closed
+    unless @door_open_detected_time.nil?
+      puts "Door closed"
+      @door_close_lambdas.each do |cur_listener|
+        cur_listener.call(@door_close_lambdas)
+      end
+    end
+  end
+
+  def add_door_opened_listener(listener)
+    @door_open_lambdas << listener
+  end
+
   def start_door_open_switch_listener
     initialize_gpio unless @gpio_is_initialized
     stop_blinking_timer_button
     @service_thread = Thread.new do 
+      # Setup a the thread to determine whether timer is enabled, set default to true
       current_thread = Thread.current
-      current_thread[:timer_enabled] = true
+      current_thread[:timer_enabled] = true 
+      #  While "true" loop to listen for door
       while ! current_thread[:stop]
         if door_open?
-          puts "Door opened" unless @door_open_detected_time
+          # If we haven't previously detected a time the door opened, the door JUST Opened
+          #puts "Door opened" unless @door_open_detected_time
           start_blinking_timer_button
-          @door_open_detected_time = Time.now.to_i unless @door_open_detected_time
+          #@door_open_detected_time = Time.now.to_i unless @door_open_detected_time
+          notify_door_opened
           if current_thread[:delay_seconds] && current_thread[:timer_enabled]
             seconds_since_open = Time.now.to_i - @door_open_detected_time
             if (seconds_since_open > current_thread[:delay_seconds]) && !@timer_has_been_tripped
@@ -111,7 +140,7 @@ class DoorOpenSwitchListenerService
             end
           end
         else
-          puts "Door closed" unless @door_open_detected_time.nil?
+          notify_door_closed
           reset_timer
           stop_blinking_timer_button
         end
@@ -129,5 +158,7 @@ class DoorOpenSwitchListenerService
   @door_open_detected_time = nil
   @gpio_is_initialized = false
   @timer_has_been_tripped = false
+  @door_open_lambdas = []
+  @door_close_lambdas = []
 
 end
