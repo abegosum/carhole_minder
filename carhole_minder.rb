@@ -7,9 +7,13 @@ TIMER_PINS = [ TIMER_SETTING_1_LED, TIMER_SETTING_2_LED, TIMER_SETTING_3_LED ]
 class CarholeMinder
   
   attr_reader :timer_setting
+  attr_reader :door_last_opened_time
+  attr_reader :door_last_closed_time
 
   def initialize
     @timer_setting = 0
+    @door_last_opened_time = nil
+    @door_last_closed_time = nil
   end
   
   def init_gpio
@@ -143,6 +147,18 @@ class CarholeMinder
     turn_off_led TIMER_SETTING_2_LED
     turn_off_led TIMER_SETTING_3_LED
   end
+  
+  def seconds_since_last_open
+    if door_last_opened_time
+      time_since_last_open = (Time.now.to_i - door_last_opened_time)
+    else 
+      0
+    end
+  end
+
+  def door_long_opened_alert_time_elsapsed?
+    door_open? and time_since_last_open >= (DOOR_LONG_OPEN_ALERT_DELAY_MINUTES * 60)
+  end
 
   def shutdown_computer
     system '/usr/bin/sudo /sbin/shutdown -h 0'
@@ -173,6 +189,14 @@ class CarholeMinder
       puts "TIMER REACHED!"
       close_garage_door_by_timer
     end
+
+    @door_open_service.add_door_opened_listener(lambda do |door_opened_time|
+      @door_last_opened_time = door_opened_time
+    end)
+
+    @door_open_service.add_door_closed_listener(lambda do |door_closed_time|
+      @door_last_closed_time = door_closed_time
+    end)
 
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
     timer_button_service.long_press_lambda = lambda do 

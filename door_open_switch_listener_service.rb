@@ -107,14 +107,19 @@ class DoorOpenSwitchListenerService
   def notify_door_closed
     unless @door_open_detected_time.nil?
       puts "Door closed"
+      door_closed_time = Time.now.to_i
       @door_close_lambdas.each do |cur_listener|
-        cur_listener.call(@door_close_lambdas)
+        cur_listener.call(door_closed_time)
       end
     end
   end
 
   def add_door_opened_listener(listener)
     @door_open_lambdas << listener
+  end
+
+  def add_door_closed_listener(listener)
+    @door_close_lambdas << listener
   end
 
   def start_door_open_switch_listener

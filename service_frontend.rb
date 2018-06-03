@@ -23,6 +23,18 @@ class ServiceFrontend
     @carhole_minder.set_timer_setting_index value
   end
 
+  def seconds_since_last_open
+    @carhole_minder.seconds_since_last_open
+  end
+
+  def door_last_opened_time
+    @carhole_minder.door_last_opened_time
+  end
+
+  def door_last_closed_time
+    @carhole_minder.door_last_closed_time
+  end
+
   private
   @carhole_minder
 end
