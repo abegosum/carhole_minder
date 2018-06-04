@@ -15,8 +15,16 @@ class ServiceFrontend
     @carhole_minder.open_or_close_garage_door
   end
 
+  def timer_settings
+    @carhole_minder.timer_settings
+  end
+
   def timer_setting_index
     @carhole_minder.get_timer_setting_index
+  end
+
+  def advance_timer_setting
+    @carhole_minder.advance_timer_setting
   end
 
   def timer_setting_index=(value)

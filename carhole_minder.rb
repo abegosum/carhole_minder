@@ -148,6 +148,10 @@ class CarholeMinder
     end
   end
 
+  def timer_settings
+    [ TIMER_SETTING_1_MINUTES, TIMER_SETTING_2_MINUTES, TIMER_SETTING_3_MINUTES ]
+  end
+
   def shutdown_service_leds
     turn_off_led READY_LED_PIN
     turn_off_led DOOR_BUTTON_LED_PIN
