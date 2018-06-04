@@ -36,6 +36,9 @@ class AlertMailer
       Thank you,
       - Carhole Garage Minder
     EOF
+    Net::SMTP.start('localhost') do |smtp|
+      smtp.send_message(message, FROM_EMAIL, ALERT_EMAILS)
+    end
   end
 
 end
