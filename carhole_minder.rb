@@ -9,6 +9,7 @@ class CarholeMinder
   attr_reader :timer_setting
   attr_reader :door_last_opened_time
   attr_reader :door_last_closed_time
+  attr_reader :door_close_attempted_time
 
   def initialize
     @timer_setting = 0
@@ -72,6 +73,9 @@ class CarholeMinder
   end
   
   def open_or_close_garage_door
+    if door_open?
+      @door_close_attempted_time = Time.now.to_i
+    end
     blink_door_button_led
     RPi::GPIO.set_low RELAY_PIN
     sleep RELAY_OPEN_DELAY
@@ -195,6 +199,7 @@ class CarholeMinder
     end)
 
     @door_open_service.add_door_closed_listener(lambda do |door_closed_time|
+      @door_close_attempted_time = nil
       @door_last_closed_time = door_closed_time
     end)
 

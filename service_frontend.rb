@@ -35,6 +35,10 @@ class ServiceFrontend
     @carhole_minder.door_last_closed_time
   end
 
+  def door_close_attempted_time
+    @carhole_minder.door_close_attempted_time
+  end
+
   private
   @carhole_minder
 end
