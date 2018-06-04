@@ -188,14 +188,14 @@ class CarholeMinder
       if @door_close_attempted_time && ((current_timestamp - @door_close_attempted_time) > DOOR_CLOSING_ALERT_DELAY_SECONDS)
         unless @door_failed_closing_alert_sent
           puts "Sending door close failure alert"
-          AlertMailer.send_door_failed_closing_alert(@door_opened_time, @door_close_attempted_time)
+          AlertMailer.send_door_failed_closing_alert(@door_last_opened_time, @door_close_attempted_time)
           @door_failed_closing_alert_sent = true
         end
       end
       if @door_last_opened_time && ((current_timestamp - @door_last_opened_time) > (DOOR_LONG_OPEN_ALERT_DELAY_MINUTES * 60))
         unless @door_long_opened_alert_sent
           puts "Sending door long open alert"
-          AlertMailer.send_door_long_opened_alert(@door_opened_time)
+          AlertMailer.send_door_long_opened_alert(@door_last_opened_time)
           @door_long_opened_alert_sent = true
         end
       end
