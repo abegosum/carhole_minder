@@ -1,6 +1,7 @@
 require_relative 'constants'
 require_relative 'button_listener_service'
 require_relative 'door_open_switch_listener_service'
+require_relative 'alert_mailer'
 
 TIMER_PINS = [ TIMER_SETTING_1_LED, TIMER_SETTING_2_LED, TIMER_SETTING_3_LED ]
 
@@ -10,11 +11,15 @@ class CarholeMinder
   attr_reader :door_last_opened_time
   attr_reader :door_last_closed_time
   attr_reader :door_close_attempted_time
+  attr_reader :door_long_opened_alert_sent
+  attr_reader :door_failed_closing_alert_sent
 
   def initialize
     @timer_setting = 0
     @door_last_opened_time = nil
     @door_last_closed_time = nil
+    @door_long_opened_alert_sent = false
+    @door_failed_closing_alert_sent = false
   end
   
   def init_gpio
@@ -172,6 +177,31 @@ class CarholeMinder
     (! @door_open_service.nil?) && @door_open_service.door_open?
   end
 
+  def reset_alerts
+    @door_long_opened_alert_sent = false
+    @door_failed_closing_alert_sent = false
+  end
+
+  def check_for_alerts_and_send
+    current_timestamp = Time.now.to_i
+    if door_open?
+      if @door_close_attempted_time && ((current_timestamp - @door_close_attempted_time) > DOOR_CLOSING_ALERT_DELAY_SECONDS)
+        unless @door_failed_closing_alert_sent
+          puts "Sending door close failure alert"
+          AlertMailer.send_door_failed_closing_alert(@door_opened_time, @door_close_attempted_time)
+          @door_failed_closing_alert_sent = true
+        end
+      end
+      if ((current_timestamp - @door_opened_time) > (DOOR_LONG_OPEN_ALERT_DELAY_MINUTES * 60))
+        unless @door_long_opened_alert_sent
+          puts "Sending door long open alert"
+          AlertMailer.send_door_long_opened_alert(@door_opened_time)
+          @door_long_opened_alert_sent = true
+        end
+      end
+    end
+  end
+
   def run!
     Thread.abort_on_exception = true
     init_gpio
@@ -201,6 +231,7 @@ class CarholeMinder
     @door_open_service.add_door_closed_listener(lambda do |door_closed_time|
       @door_close_attempted_time = nil
       @door_last_closed_time = door_closed_time
+      reset_alerts
     end)
 
     timer_button_service = ButtonListenerService.new(TIMER_BUTTON_PIN, 'TIMER_BUTTON')
@@ -227,6 +258,7 @@ class CarholeMinder
     
     begin
       while true
+        check_for_alerts_and_send
         sleep MAIN_THREAD_SLEEP_DELAY
       end
     rescue SignalException => e
