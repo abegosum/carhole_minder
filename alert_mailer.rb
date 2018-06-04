@@ -23,4 +23,19 @@ class AlertMailer
     end
   end
 
+  def self.send_door_failed_closing_alert(timestamp_opened, timestamp_attempted_close)
+    time_opened = Time.at(timestamp_opened).to_datetime
+    time_attempted_close = Time.at(timestamp_attempted_close).to_datetime
+    message = <<~EOF
+      Subject: Garage Door Couldn't Close
+
+      An attempt to close your garage at #{time_attempted_close.strftime("%l:%M %P on %-m/%-d/%Y")} failed to close it within #{DOOR_CLOSING_ALERT_DELAY_SECONDS} seconds.
+
+      Check to see if the sensor on the door is misaligned.  If the sensor is in the proper position, check whether the door is obstructed.
+
+      Thank you,
+      - Carhole Garage Minder
+    EOF
+  end
+
 end
