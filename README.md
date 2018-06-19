@@ -28,10 +28,12 @@ To create this project, you'll need the following components:
 Note that all of the instructions on this page assume that you're running a recent version of Raspbian or another Debian variant on a Raspberry Pi.
 
 1. Install ruby and ruby development headers
+
 ```
 sudo apt-get install ruby ruby-dev
 ```
 1. Install bundler gem globally
+
 ```
 sudo gem install bundler
 ```
