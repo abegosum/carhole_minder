@@ -17,10 +17,44 @@ To create this project, you'll need the following components:
 
 ## Project Software Requirements
 
-* Ruby (I used v2.3.3 to build the project, though other versions may or may not work)
+* Ruby >= 2.3
+* Ruby Development Headers
 * Bundler
 
+### Installing Requirements
+
+Note that all of the instructions on this page assume that you're running a recent version of Raspbian or another Debian variant on a Raspberry Pi.
+
+1. Install ruby and ruby development headers
+```
+sudo apt-get install ruby ruby-dev
+```
+1. Install bundler gem globally
+```
+sudo gem install bundler
+```
+
 ## Building and Testing the Software
+
+1. Clone the repository into a local folder
+```
+git clone git@<server>:<path>/carhole_minder.git
+cd carhole_minder
+```
+1. Install the Bundled Gems (local to the project or another path, if you prefer)
+```
+bundle install --path=vendor/bundle
+```
+1. Copy the default configuration (`constants.rb.default`) to `constants.rb`
+```
+cp constants.rb.default constants.rb
+```
+1. Test the software by running the `daemon_start.rb` file
+```
+bundle exec ruby daemon_start.rb
+```
+
+You should now see "Initializing pin states" and "Enabling timer" on the console.  Additionally, the timer and door button LEDs should fully illuminate. 
 
 ## Starting on System Startup
 
