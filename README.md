@@ -17,6 +17,8 @@ To create this project, you'll need the following components:
 
 ## Building the Hardware
 
+I'm working on a full write-up on the hardware build.  Please check back later for more information!
+
 ## Project Software Requirements
 
 * Ruby >= 2.3
