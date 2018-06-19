@@ -29,34 +29,31 @@ Note that all of the instructions on this page assume that you're running a rece
 
 1. Install ruby and ruby development headers
 
-```
-sudo apt-get install ruby ruby-dev
-```
+        sudo apt-get install ruby ruby-dev
+
 1. Install bundler gem globally
 
-```
-sudo gem install bundler
-```
+        sudo gem install bundler
 
 ## Building and Testing the Software
 
 1. Clone the repository into a local folder
-```
-git clone git@<server>:<path>/carhole_minder.git
-cd carhole_minder
-```
+
+        git clone git@<server>:<path>/carhole_minder.git
+        cd carhole_minder
+
 1. Install the Bundled Gems (local to the project or another path, if you prefer)
-```
-bundle install --path=vendor/bundle
-```
+
+        bundle install --path=vendor/bundle
+
 1. Copy the default configuration (`constants.rb.default`) to `constants.rb`
-```
-cp constants.rb.default constants.rb
-```
+
+        cp constants.rb.default constants.rb
+
 1. Test the software by running the `daemon_start.rb` file
-```
-bundle exec ruby daemon_start.rb
-```
+
+        bundle exec ruby daemon_start.rb
+
 
 You should now see "Initializing pin states" and "Enabling timer" on the console.  Additionally, the timer and door button LEDs should fully illuminate. 
 
