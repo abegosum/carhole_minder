@@ -17,7 +17,7 @@ To create this project, you'll need the following components:
 
 ## Building the Hardware
 
-I'm working on a full write-up on the hardware build.  Please check back later for more information!
+Please check my blog [here](https://thelurkingvariable.com/2018/06/19/a-garage-door-controller-based-on-a-raspberry-pi/) for a write up on how I built the hardware and what components I used.
 
 ## Project Software Requirements
 
