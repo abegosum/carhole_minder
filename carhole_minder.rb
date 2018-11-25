@@ -114,6 +114,12 @@ class CarholeMinder
     update_timer_led_indicator
   end
 
+  def advance_timer_setting_and_update
+    advance_timer_setting
+    @door_open_service.update_timer_setting timer_setting
+    @door_open_service.reset_timer
+  end
+
   def disable_timer
     @timer_setting = TIMER_DISABLED_INDICATOR
     puts "Timer disabled"

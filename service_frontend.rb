@@ -12,7 +12,13 @@ class ServiceFrontend
   end
 
   def open_or_close_garage_door
+    if @carhole_minder.door_open?
+      result = :closing
+    else
+      result = :opening
+    end
     @carhole_minder.open_or_close_garage_door
+    result
   end
 
   def timer_settings
@@ -24,7 +30,8 @@ class ServiceFrontend
   end
 
   def advance_timer_setting
-    @carhole_minder.advance_timer_setting
+    @carhole_minder.advance_timer_setting_and_update
+    @carhole_minder.get_timer_setting_index
   end
 
   def timer_setting_index=(value)
